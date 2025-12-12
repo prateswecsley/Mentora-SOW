@@ -165,12 +165,7 @@ export default async function DashboardPage() {
                                 </div>
                             </div>
 
-                            {/* Play Icon on Hover */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30">
-                                <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm border border-white/50">
-                                    <Play className="w-8 h-8 fill-white text-white" />
-                                </div>
-                            </div>
+
                         </Link>
 
                         {/* Card 2: Chat com Mentora SOW */}
@@ -208,12 +203,7 @@ export default async function DashboardPage() {
                                     </div>
                                 </div>
 
-                                {/* Play Icon on Hover */}
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30">
-                                    <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm border border-white/50">
-                                        <Play className="w-8 h-8 fill-white text-white" />
-                                    </div>
-                                </div>
+
                             </Link>
                         ) : (
                             <div className="relative h-48 bg-gray-800 rounded-lg overflow-hidden shadow-lg border-2 border-gray-700/30 opacity-60">
