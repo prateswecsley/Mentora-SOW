@@ -3,7 +3,10 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
+import { BASE_IDENTITY, SPHERE_PROMPTS } from "@/lib/mentoraPrompts"
 
+// Create OpenAI client with custom configuration if needed
+// The library handles OPENAI_API_KEY processing automatically
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 })
@@ -15,11 +18,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { message, history } = await req.json()
+    const { message, history, sphere } = await req.json()
 
     if (!message) {
         return NextResponse.json({ error: "Message required" }, { status: 400 })
     }
+
+    // Default to sphere1 if not provided or invalid
+    const currentSphere = (sphere as keyof typeof SPHERE_PROMPTS) || "sphere1"
+    const sphereInstruction = SPHERE_PROMPTS[currentSphere] || SPHERE_PROMPTS["sphere1"]
 
     try {
         const user = await prisma.user.findUnique({
@@ -33,34 +40,33 @@ export async function POST(req: Request) {
 
         // Contextualize with previous reports
         const reportsContext = user.reports
-            .map((r) => `Relatório Etapa ${r.stageId}:\n${r.report}`)
-            .join("\n\n")
+            .map((r) => `[Relatório Etapa ${r.stageId}]:\n${r.report}`)
+            .join("\n\n------------------\n\n")
 
         const systemPrompt = `
-Você é a Mentora SOW AI, uma mentora espiritual e emocional.
-Você já conduziu a aluna por 5 etapas de autoconhecimento e agora está conversando com ela livremente.
-Use os relatórios das etapas anteriores como contexto para suas respostas.
+${BASE_IDENTITY}
 
-Contexto da Aluna:
-${reportsContext}
+CONTEXTO DO USUÁRIO (RAG - LAUDOS):
+${reportsContext ? reportsContext : "Ainda não há relatórios gerados."}
 
-Mantenha o tom acolhedor, profundo e espiritual.
+INSTRUÇÕES DA ESFERA SELECIONADA AGORA:
+${sphereInstruction}
+
+DIRETRIZ FINAL:
+Responda APENAS com base no contexto acima. Se a aluna perguntar algo fora da sua competência (ex: jurídico, médico), decline educadamente.
 `
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o", // GPT-4 Omni - modelo mais avançado
+            model: "gpt-4o", // Ensuring we use the best model for this complex instruction
             messages: [
                 { role: "system", content: systemPrompt },
                 ...(history || []),
                 { role: "user", content: message },
             ],
+            temperature: 0.7, // Balanced creativity and adherence
         })
 
-        const reply = completion.choices[0].message.content || "Não consegui processar sua mensagem."
-
-        // Save chat history (simplified for MVP, appending to single record)
-        // In a real app, we'd append to a JSON array or separate table rows
-        // Here we just update the last interaction timestamp or similar if needed
+        const reply = completion.choices[0].message.content || "Não consegui processar sua mensagem. Tente novamente."
 
         return NextResponse.json({ reply })
     } catch (error) {

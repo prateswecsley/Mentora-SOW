@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Send, User, Bot } from "lucide-react"
+import { Send, User, Bot, Heart, MessageSquare, TrendingUp } from "lucide-react"
 import { twMerge } from "tailwind-merge"
 
 interface Message {
@@ -9,12 +9,45 @@ interface Message {
     content: string
 }
 
+type Sphere = "sphere1" | "sphere2" | "sphere3"
+
+const SPHERES = [
+    {
+        id: "sphere1" as Sphere,
+        name: "Vida & Identidade",
+        icon: Heart,
+        color: "text-pink-400",
+        bgColor: "bg-pink-400/10",
+        borderColor: "border-pink-400/20",
+        description: "Propósito, Espiritualidade e Emoção"
+    },
+    {
+        id: "sphere2" as Sphere,
+        name: "Comunicação & Copy",
+        icon: MessageSquare,
+        color: "text-purple-400",
+        bgColor: "bg-purple-400/10",
+        borderColor: "border-purple-400/20",
+        description: "Posicionamento, Voz e Textos"
+    },
+    {
+        id: "sphere3" as Sphere,
+        name: "Digital & Estratégia",
+        icon: TrendingUp,
+        color: "text-blue-400",
+        bgColor: "bg-blue-400/10",
+        borderColor: "border-blue-400/20",
+        description: "Mercado, Produtos e Vendas"
+    }
+]
+
 export function ChatInterface() {
     const [messages, setMessages] = useState<Message[]>([
-        { role: "assistant", content: "Olá! Sou a Mentora SOW. Li seus relatórios e estou aqui para te ajudar a aprofundar sua jornada. Sobre o que gostaria de conversar hoje?" }
+        { role: "assistant", content: "Olá! Sou a Mentora SOW. Selecione acima sobre qual área você quer conversar e vamos começar. Que direção você busca hoje?" }
     ])
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [selectedSphere, setSelectedSphere] = useState<Sphere>("sphere1")
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -40,7 +73,8 @@ export function ChatInterface() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     message: input,
-                    history: messages.filter(m => m.role !== "system")
+                    history: messages.filter(m => m.role !== "system"),
+                    sphere: selectedSphere
                 }),
             })
 
@@ -58,47 +92,88 @@ export function ChatInterface() {
 
     return (
         <div className="flex flex-col h-[calc(100vh-100px)] bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-700 to-indigo-800 p-4 text-white shadow-md z-10">
-                <h2 className="text-lg font-bold flex items-center gap-2">
-                    <Bot className="w-6 h-6" />
-                    Mentora SOW AI
-                </h2>
-                <p className="text-purple-200 text-sm">Conectada à sua essência</p>
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-900 to-indigo-900 p-4 text-white shadow-md z-10">
+                <div className="flex items-center gap-3">
+                    <div className="bg-white/10 p-2 rounded-full backdrop-blur-sm">
+                        <Bot className="w-6 h-6 text-purple-200" />
+                    </div>
+                    <div>
+                        <h2 className="text-lg font-bold">Mentora SOW AI</h2>
+                        <p className="text-purple-200 text-xs">Inteligência Espiritual & Estratégica</p>
+                    </div>
+                </div>
+
+                {/* Sphere Selector */}
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                    {SPHERES.map((sphere) => {
+                        const Icon = sphere.icon
+                        const isSelected = selectedSphere === sphere.id
+                        return (
+                            <button
+                                key={sphere.id}
+                                onClick={() => setSelectedSphere(sphere.id)}
+                                className={twMerge(
+                                    "flex flex-col items-center p-2 rounded-lg text-center transition-all border-2",
+                                    isSelected
+                                        ? `bg-white/10 ${sphere.borderColor} border-white/40 shadow-inner`
+                                        : "bg-black/20 border-transparent hover:bg-black/30 opacity-70 hover:opacity-100"
+                                )}
+                            >
+                                <Icon className={twMerge("w-5 h-5 mb-1", isSelected ? "text-white" : sphere.color)} />
+                                <span className="text-xs font-bold text-white">{sphere.name}</span>
+                            </button>
+                        )
+                    })}
+                </div>
             </div>
 
+            {/* Chat Area */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50">
+                {/* Context Info Badge */}
+                <div className="flex justify-center">
+                    <span className={twMerge(
+                        "text-xs px-3 py-1 rounded-full border",
+                        SPHERES.find(s => s.id === selectedSphere)?.bgColor,
+                        SPHERES.find(s => s.id === selectedSphere)?.color,
+                        SPHERES.find(s => s.id === selectedSphere)?.borderColor
+                    )}>
+                        Falando sobre: <strong>{SPHERES.find(s => s.id === selectedSphere)?.name}</strong>
+                    </span>
+                </div>
+
                 {messages.map((msg, idx) => (
                     <div
                         key={idx}
                         className={twMerge(
-                            "flex gap-4 max-w-[80%]",
+                            "flex gap-4 max-w-[85%]",
                             msg.role === "user" ? "ml-auto flex-row-reverse" : ""
                         )}
                     >
                         <div className={twMerge(
-                            "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm",
-                            msg.role === "user" ? "bg-purple-100 text-purple-600" : "bg-indigo-100 text-indigo-600"
+                            "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm",
+                            msg.role === "user" ? "bg-purple-100 text-purple-600" : "bg-indigo-900 text-white"
                         )}>
-                            {msg.role === "user" ? <User className="w-6 h-6" /> : <Bot className="w-6 h-6" />}
+                            {msg.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                         </div>
 
                         <div className={twMerge(
-                            "p-4 rounded-2xl shadow-sm text-gray-700 leading-relaxed",
+                            "p-4 rounded-2xl shadow-sm leading-relaxed text-sm md:text-base",
                             msg.role === "user"
-                                ? "bg-white border border-purple-100 rounded-tr-none"
-                                : "bg-white border border-indigo-100 rounded-tl-none"
+                                ? "bg-white border border-purple-100 text-gray-700 rounded-tr-none"
+                                : "bg-white border border-indigo-100 text-gray-800 rounded-tl-none"
                         )}>
-                            {msg.content}
+                            <div className="whitespace-pre-wrap">{msg.content}</div>
                         </div>
                     </div>
                 ))}
                 {isLoading && (
                     <div className="flex gap-4 max-w-[80%]">
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
-                            <Bot className="w-6 h-6" />
+                        <div className="w-8 h-8 rounded-full bg-indigo-900 text-white flex items-center justify-center flex-shrink-0">
+                            <Bot className="w-5 h-5 animate-pulse" />
                         </div>
-                        <div className="bg-white border border-indigo-100 p-4 rounded-2xl rounded-tl-none text-gray-500 italic">
-                            Digitando...
+                        <div className="bg-white border border-indigo-100 p-4 rounded-2xl rounded-tl-none text-gray-400 italic text-sm">
+                            Mentora SOW pensando...
                         </div>
                     </div>
                 )}
@@ -111,13 +186,13 @@ export function ChatInterface() {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Converse com sua mentora..."
-                        className="flex-1 p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all"
+                        placeholder={`Pergunte algo sobre ${SPHERES.find(s => s.id === selectedSphere)?.name}...`}
+                        className="flex-1 p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all placeholder-gray-400"
                     />
                     <button
                         type="submit"
                         disabled={isLoading || !input.trim()}
-                        className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-purple-900 hover:bg-purple-800 text-white p-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Send className="w-5 h-5" />
                     </button>
