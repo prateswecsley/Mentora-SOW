@@ -113,32 +113,35 @@ export function ChatInterface() {
     const currentSphereData = SPHERES.find(s => s.id === selectedSphere)
 
     // Custom Markdown Renderer to satisfy modern UI request
+    // Fixed: Wrapped ReactMarkdown in a div to avoid passing className to the component itself
+    // which causes runtime errors in newer versions
     const MarkdownRenderer = ({ content, sphereData }: { content: string, sphereData?: typeof SPHERES[0] }) => {
         return (
-            <ReactMarkdown
-                className="prose prose-sm max-w-none text-gray-700"
-                components={{
-                    // Headers as highlighted cards
-                    h1: ({ node, ...props }) => <h1 className={`text-lg font-bold mt-6 mb-3 p-3 rounded-lg border-l-4 ${sphereData?.borderColor || 'border-gray-300'} bg-white shadow-sm`} {...props} />,
-                    h2: ({ node, ...props }) => <h2 className={`text-base font-bold mt-5 mb-2 flex items-center gap-2 ${sphereData?.color || 'text-gray-800'}`} {...props} />,
-                    h3: ({ node, ...props }) => (
-                        <div className={`mt-4 mb-2 p-2 rounded-md bg-opacity-50 ${sphereData?.bgColor || 'bg-gray-100'}`}>
-                            <h3 className="text-sm font-bold uppercase tracking-wide opacity-80" {...props} />
-                        </div>
-                    ),
-                    // Paragraphs with better spacing
-                    p: ({ node, ...props }) => <p className="mb-3 leading-relaxed" {...props} />,
-                    // Lists nicely spaced
-                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />,
-                    ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-4 space-y-1" {...props} />,
-                    // Strong text highlighted with sphere color
-                    strong: ({ node, ...props }) => <strong className={`font-bold ${sphereData?.color || 'text-purple-700'}`} {...props} />,
-                    // Code blocks/Quotes as specialized boxes
-                    blockquote: ({ node, ...props }) => <blockquote className={`border-l-4 pl-4 italic text-gray-600 my-4 ${sphereData?.borderColor || 'border-gray-300'}`} {...props} />,
-                }}
-            >
-                {content}
-            </ReactMarkdown>
+            <div className="prose prose-sm max-w-none text-gray-700">
+                <ReactMarkdown
+                    components={{
+                        // Headers as highlighted cards
+                        h1: ({ node, ...props }) => <h1 className={`text-lg font-bold mt-6 mb-3 p-3 rounded-lg border-l-4 ${sphereData?.borderColor || 'border-gray-300'} bg-white shadow-sm`} {...props} />,
+                        h2: ({ node, ...props }) => <h2 className={`text-base font-bold mt-5 mb-2 flex items-center gap-2 ${sphereData?.color || 'text-gray-800'}`} {...props} />,
+                        h3: ({ node, ...props }) => (
+                            <div className={`mt-4 mb-2 p-2 rounded-md bg-opacity-50 ${sphereData?.bgColor || 'bg-gray-100'}`}>
+                                <h3 className="text-sm font-bold uppercase tracking-wide opacity-80" {...props} />
+                            </div>
+                        ),
+                        // Paragraphs with better spacing
+                        p: ({ node, ...props }) => <p className="mb-3 leading-relaxed" {...props} />,
+                        // Lists nicely spaced
+                        ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />,
+                        ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-4 space-y-1" {...props} />,
+                        // Strong text highlighted with sphere color
+                        strong: ({ node, ...props }) => <strong className={`font-bold ${sphereData?.color || 'text-purple-700'}`} {...props} />,
+                        // Code blocks/Quotes as specialized boxes
+                        blockquote: ({ node, ...props }) => <blockquote className={`border-l-4 pl-4 italic text-gray-600 my-4 ${sphereData?.borderColor || 'border-gray-300'}`} {...props} />,
+                    }}
+                >
+                    {content}
+                </ReactMarkdown>
+            </div>
         )
     }
 
