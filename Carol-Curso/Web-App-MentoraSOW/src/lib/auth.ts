@@ -1,0 +1,67 @@
+import NextAuth, { NextAuthOptions } from "next-auth"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import GoogleProvider from "next-auth/providers/google"
+import GitHubProvider from "next-auth/providers/github"
+import EmailProvider from "next-auth/providers/email"
+import { prisma } from "@/lib/prisma"
+
+import CredentialsProvider from "next-auth/providers/credentials"
+
+export const authOptions: NextAuthOptions = {
+    adapter: PrismaAdapter(prisma),
+    session: {
+        strategy: "jwt",
+    },
+    providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID || "",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+        }),
+        GitHubProvider({
+            clientId: process.env.GITHUB_ID || "",
+            clientSecret: process.env.GITHUB_SECRET || "",
+        }),
+        EmailProvider({
+            server: process.env.EMAIL_SERVER,
+            from: process.env.EMAIL_FROM,
+        }),
+        CredentialsProvider({
+            name: "Login de Teste",
+            credentials: {
+                email: { label: "Email", type: "email", placeholder: "teste@sow.com" },
+            },
+            async authorize(credentials) {
+                if (!credentials?.email) return null
+
+                // Find or create user for dev/test
+                const user = await prisma.user.upsert({
+                    where: { email: credentials.email },
+                    update: {},
+                    create: {
+                        email: credentials.email,
+                        name: credentials.email.split("@")[0],
+                    },
+                })
+
+                return user
+            }
+        })
+    ],
+    callbacks: {
+        session: async ({ session, token }) => {
+            if (session?.user) {
+                (session.user as any).id = token.sub;
+            }
+            return session;
+        },
+        jwt: async ({ token, user }) => {
+            if (user) {
+                token.sub = user.id;
+            }
+            return token;
+        }
+    },
+    pages: {
+        signIn: '/auth/signin', // Custom signin page if needed, or default
+    },
+}
