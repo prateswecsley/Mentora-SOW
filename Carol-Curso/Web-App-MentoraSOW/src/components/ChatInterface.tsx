@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Send, User, Bot, Heart, MessageSquare, TrendingUp, Sparkles } from "lucide-react"
 import { twMerge } from "tailwind-merge"
+import ReactMarkdown from 'react-markdown'
 
 interface Message {
     role: "user" | "assistant" | "system"
@@ -111,6 +112,36 @@ export function ChatInterface() {
 
     const currentSphereData = SPHERES.find(s => s.id === selectedSphere)
 
+    // Custom Markdown Renderer to satisfy modern UI request
+    const MarkdownRenderer = ({ content, sphereData }: { content: string, sphereData?: typeof SPHERES[0] }) => {
+        return (
+            <ReactMarkdown
+                className="prose prose-sm max-w-none text-gray-700"
+                components={{
+                    // Headers as highlighted cards
+                    h1: ({ node, ...props }) => <h1 className={`text-lg font-bold mt-6 mb-3 p-3 rounded-lg border-l-4 ${sphereData?.borderColor || 'border-gray-300'} bg-white shadow-sm`} {...props} />,
+                    h2: ({ node, ...props }) => <h2 className={`text-base font-bold mt-5 mb-2 flex items-center gap-2 ${sphereData?.color || 'text-gray-800'}`} {...props} />,
+                    h3: ({ node, ...props }) => (
+                        <div className={`mt-4 mb-2 p-2 rounded-md bg-opacity-50 ${sphereData?.bgColor || 'bg-gray-100'}`}>
+                            <h3 className="text-sm font-bold uppercase tracking-wide opacity-80" {...props} />
+                        </div>
+                    ),
+                    // Paragraphs with better spacing
+                    p: ({ node, ...props }) => <p className="mb-3 leading-relaxed" {...props} />,
+                    // Lists nicely spaced
+                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />,
+                    ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-4 space-y-1" {...props} />,
+                    // Strong text highlighted with sphere color
+                    strong: ({ node, ...props }) => <strong className={`font-bold ${sphereData?.color || 'text-purple-700'}`} {...props} />,
+                    // Code blocks/Quotes as specialized boxes
+                    blockquote: ({ node, ...props }) => <blockquote className={`border-l-4 pl-4 italic text-gray-600 my-4 ${sphereData?.borderColor || 'border-gray-300'}`} {...props} />,
+                }}
+            >
+                {content}
+            </ReactMarkdown>
+        )
+    }
+
     return (
         <div className="flex flex-col h-[calc(100vh-100px)] bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             {/* Header */}
@@ -167,7 +198,7 @@ export function ChatInterface() {
                     <div
                         key={idx}
                         className={twMerge(
-                            "flex gap-4 max-w-[85%]",
+                            "flex gap-4 max-w-[90%]",
                             msg.role === "user" ? "ml-auto flex-row-reverse" : ""
                         )}
                     >
@@ -182,9 +213,13 @@ export function ChatInterface() {
                             "p-4 rounded-2xl shadow-sm leading-relaxed text-sm md:text-base",
                             msg.role === "user"
                                 ? "bg-white border border-purple-100 text-gray-700 rounded-tr-none"
-                                : "bg-white border border-indigo-100 text-gray-800 rounded-tl-none"
+                                : "bg-white border border-indigo-100 text-gray-800 rounded-tl-none w-full"
                         )}>
-                            <div className="whitespace-pre-wrap">{msg.content}</div>
+                            {msg.role === "assistant" ? (
+                                <MarkdownRenderer content={msg.content} sphereData={currentSphereData} />
+                            ) : (
+                                <div className="whitespace-pre-wrap">{msg.content}</div>
+                            )}
                         </div>
                     </div>
                 ))}
