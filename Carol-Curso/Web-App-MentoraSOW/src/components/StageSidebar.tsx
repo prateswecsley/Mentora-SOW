@@ -64,15 +64,7 @@ export function StageSidebar({ completedStages, currentStage }: StageSidebarProp
             </nav>
 
             <div className="mt-auto pt-6 border-t border-gray-800 space-y-4">
-                <Link
-                    href="/chat"
-                    className={twMerge(
-                        "flex items-center space-x-3 p-3 rounded-lg transition-colors",
-                        completedStages.length === 5 ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md hover:shadow-purple-500/20" : "text-gray-600 cursor-not-allowed"
-                    )}
-                >
-                    <span className="font-bold">Chat com Mentora</span>
-                </Link>
+
 
                 <button
                     onClick={() => signOut({ callbackUrl: "/auth/signin" })}
