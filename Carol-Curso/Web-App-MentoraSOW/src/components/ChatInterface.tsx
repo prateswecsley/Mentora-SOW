@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Send, User, Bot, Heart, MessageSquare, TrendingUp } from "lucide-react"
+import { Send, User, Bot, Heart, MessageSquare, TrendingUp, Sparkles } from "lucide-react"
 import { twMerge } from "tailwind-merge"
 
 interface Message {
@@ -19,7 +19,12 @@ const SPHERES = [
         color: "text-pink-400",
         bgColor: "bg-pink-400/10",
         borderColor: "border-pink-400/20",
-        description: "Propósito, Espiritualidade e Emoção"
+        description: "Propósito, Espiritualidade e Emoção",
+        topics: [
+            "Quem sou eu segundo a minha essência?",
+            "Como descobrir meu propósito em Deus?",
+            "Estou sentindo um bloqueio emocional, me ajuda?"
+        ]
     },
     {
         id: "sphere2" as Sphere,
@@ -28,7 +33,12 @@ const SPHERES = [
         color: "text-purple-400",
         bgColor: "bg-purple-400/10",
         borderColor: "border-purple-400/20",
-        description: "Posicionamento, Voz e Textos"
+        description: "Posicionamento, Voz e Textos",
+        topics: [
+            "Crie uma copy para um post de conexão.",
+            "Como minha voz arquétipa deve falar?",
+            "Me ajude a escrever um roteiro de Reels."
+        ]
     },
     {
         id: "sphere3" as Sphere,
@@ -37,7 +47,12 @@ const SPHERES = [
         color: "text-blue-400",
         bgColor: "bg-blue-400/10",
         borderColor: "border-blue-400/20",
-        description: "Mercado, Produtos e Vendas"
+        description: "Mercado, Produtos e Vendas",
+        topics: [
+            "Quem é a minha persona ideal?",
+            "Qual produto digital devo criar primeiro?",
+            "Como vender sem parecer vendedora?"
+        ]
     }
 ]
 
@@ -58,11 +73,10 @@ export function ChatInterface() {
         scrollToBottom()
     }, [messages])
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!input.trim() || isLoading) return
+    const handleSendMessage = async (text: string) => {
+        if (!text.trim() || isLoading) return
 
-        const userMessage = { role: "user" as const, content: input }
+        const userMessage = { role: "user" as const, content: text }
         setMessages(prev => [...prev, userMessage])
         setInput("")
         setIsLoading(true)
@@ -72,7 +86,7 @@ export function ChatInterface() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    message: input,
+                    message: text,
                     history: messages.filter(m => m.role !== "system"),
                     sphere: selectedSphere
                 }),
@@ -89,6 +103,13 @@ export function ChatInterface() {
             setIsLoading(false)
         }
     }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        handleSendMessage(input)
+    }
+
+    const currentSphereData = SPHERES.find(s => s.id === selectedSphere)
 
     return (
         <div className="flex flex-col h-[calc(100vh-100px)] bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -129,16 +150,16 @@ export function ChatInterface() {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50 flex flex-col">
                 {/* Context Info Badge */}
-                <div className="flex justify-center">
+                <div className="flex justify-center flex-shrink-0">
                     <span className={twMerge(
                         "text-xs px-3 py-1 rounded-full border",
-                        SPHERES.find(s => s.id === selectedSphere)?.bgColor,
-                        SPHERES.find(s => s.id === selectedSphere)?.color,
-                        SPHERES.find(s => s.id === selectedSphere)?.borderColor
+                        currentSphereData?.bgColor,
+                        currentSphereData?.color,
+                        currentSphereData?.borderColor
                     )}>
-                        Falando sobre: <strong>{SPHERES.find(s => s.id === selectedSphere)?.name}</strong>
+                        Falando sobre: <strong>{currentSphereData?.name}</strong>
                     </span>
                 </div>
 
@@ -167,6 +188,30 @@ export function ChatInterface() {
                         </div>
                     </div>
                 ))}
+
+                {/* Sender Recommendations (Topics) */}
+                {messages.length === 1 && currentSphereData && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 px-4">
+                        {currentSphereData.topics.map((topic, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => handleSendMessage(topic)}
+                                className={twMerge(
+                                    "text-left p-3 rounded-xl border transition-all text-xs hover:shadow-md",
+                                    "bg-white hover:bg-gray-50 text-gray-600",
+                                    currentSphereData.borderColor
+                                )}
+                            >
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Sparkles className={twMerge("w-3 h-3", currentSphereData.color)} />
+                                    <span className={twMerge("font-bold", currentSphereData.color)}>Sugestão</span>
+                                </div>
+                                {topic}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 {isLoading && (
                     <div className="flex gap-4 max-w-[80%]">
                         <div className="w-8 h-8 rounded-full bg-indigo-900 text-white flex items-center justify-center flex-shrink-0">
@@ -180,13 +225,13 @@ export function ChatInterface() {
                 <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-gray-100">
+            <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-gray-100 flex-shrink-0">
                 <div className="flex gap-2">
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder={`Pergunte algo sobre ${SPHERES.find(s => s.id === selectedSphere)?.name}...`}
+                        placeholder={`Pergunte algo sobre ${currentSphereData?.name}...`}
                         className="flex-1 p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all placeholder-gray-400"
                     />
                     <button
