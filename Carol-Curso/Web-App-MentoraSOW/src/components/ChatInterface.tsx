@@ -189,16 +189,16 @@ export function ChatInterface() {
                     </div>
                 ))}
 
-                {/* Sender Recommendations (Topics) */}
-                {messages.length === 1 && currentSphereData && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 px-4">
+                {/* Sender Recommendations (Topics) - Always visible based on current sphere */}
+                {currentSphereData && !isLoading && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 px-4 sticky bottom-0 pb-2">
                         {currentSphereData.topics.map((topic, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => handleSendMessage(topic)}
                                 className={twMerge(
                                     "text-left p-3 rounded-xl border transition-all text-xs hover:shadow-md",
-                                    "bg-white hover:bg-gray-50 text-gray-600",
+                                    "bg-white hover:bg-gray-50 text-gray-600 opacity-90 hover:opacity-100",
                                     currentSphereData.borderColor
                                 )}
                             >
