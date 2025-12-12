@@ -64,7 +64,17 @@ export function ChatInterface() {
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [selectedSphere, setSelectedSphere] = useState<Sphere>("sphere1")
+    const [suggestions, setSuggestions] = useState<string[]>([])
+
     const messagesEndRef = useRef<HTMLDivElement>(null)
+    const currentSphereData = SPHERES.find(s => s.id === selectedSphere)
+
+    // Initial suggestions based on sphere
+    useEffect(() => {
+        if (currentSphereData) {
+            setSuggestions(currentSphereData.topics)
+        }
+    }, [selectedSphere, currentSphereData?.topics])
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -72,7 +82,7 @@ export function ChatInterface() {
 
     useEffect(() => {
         scrollToBottom()
-    }, [messages])
+    }, [messages, suggestions])
 
     const handleSendMessage = async (text: string) => {
         if (!text.trim() || isLoading) return
@@ -98,6 +108,11 @@ export function ChatInterface() {
             if (data.reply) {
                 setMessages(prev => [...prev, { role: "assistant", content: data.reply }])
             }
+
+            // Context-aware suggestions update
+            if (data.suggestions && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+                setSuggestions(data.suggestions)
+            }
         } catch (error) {
             console.error("Error sending message:", error)
         } finally {
@@ -109,8 +124,6 @@ export function ChatInterface() {
         e.preventDefault()
         handleSendMessage(input)
     }
-
-    const currentSphereData = SPHERES.find(s => s.id === selectedSphere)
 
     // Custom Markdown Renderer to satisfy modern UI request
     // Fixed: Wrapped ReactMarkdown in a div to avoid passing className to the component itself
@@ -227,10 +240,10 @@ export function ChatInterface() {
                     </div>
                 ))}
 
-                {/* Sender Recommendations (Topics) - Always visible based on current sphere */}
+                {/* Sender Recommendations (Topics) - Dynamic based on state */}
                 {currentSphereData && !isLoading && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 px-4 sticky bottom-0 pb-2">
-                        {currentSphereData.topics.map((topic, idx) => (
+                        {suggestions.map((topic, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => handleSendMessage(topic)}

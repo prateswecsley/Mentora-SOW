@@ -52,23 +52,47 @@ ${reportsContext ? reportsContext : "Ainda não há relatórios gerados."}
 INSTRUÇÕES DA ESFERA SELECIONADA AGORA:
 ${sphereInstruction}
 
+DIRETRIZ DE FORMATO DE RESPOSTA (OBRIGATÓRIO):
+Você DEVE SEMPRE responder no formato JSON com duas chaves:
+1. "reply": A sua resposta textual completa para a aluna, formatada em Markdown.
+2. "suggestions": Uma lista (array) de 3 strings curtas com sugestões de perguntas que a aluna pode fazer a seguir para continuar o papo. As sugestões devem ser contextualizadas com o que você acabou de responder.
+
+Exemplo de saída JSON:
+{
+  "reply": "Sua resposta aqui...",
+  "suggestions": ["Como posso aprofundar nisso?", "Me dê um exemplo prático", "Qual o próximo passo?"]
+}
+
 DIRETRIZ FINAL:
-Responda APENAS com base no contexto acima. Se a aluna perguntar algo fora da sua competência (ex: jurídico, médico), decline educadamente.
+Responda APENAS com base no contexto acima. Se a aluna perguntar algo fora da sua competência (ex: jurídico, médico), decline educadamente, mas mantendo o JSON.
 `
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o", // Ensuring we use the best model for this complex instruction
+            model: "gpt-4o",
             messages: [
                 { role: "system", content: systemPrompt },
                 ...(history || []),
                 { role: "user", content: message },
             ],
-            temperature: 0.7, // Balanced creativity and adherence
+            response_format: { type: "json_object" }, // Enforcing structured output
+            temperature: 0.7,
         })
 
-        const reply = completion.choices[0].message.content || "Não consegui processar sua mensagem. Tente novamente."
+        const content = completion.choices[0].message.content
+        let parsedResponse
 
-        return NextResponse.json({ reply })
+        try {
+            parsedResponse = content ? JSON.parse(content) : { reply: "Erro ao processar resposta.", suggestions: [] }
+        } catch (e) {
+            console.error("Failed to parse JSON response from AI", e)
+            // Fallback if parsing fails
+            parsedResponse = { reply: content || "Erro no formato da resposta.", suggestions: [] }
+        }
+
+        return NextResponse.json({
+            reply: parsedResponse.reply,
+            suggestions: parsedResponse.suggestions || []
+        })
     } catch (error) {
         console.error("Error in chat:", error)
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
