@@ -34,9 +34,23 @@ export function UserMenu() {
                 className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors group"
             >
                 {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold shadow-lg">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold shadow-lg overflow-hidden">
                     {session.user.image ? (
-                        <img src={session.user.image} alt={session.user.name || ""} className="w-full h-full rounded-full object-cover" />
+                        <img
+                            src={session.user.image}
+                            alt={session.user.name || ""}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.parentElement?.classList.remove('overflow-hidden'); // Optional tweak
+                                // Show initials by un-hiding a sibling or just rely on the fact that if img is hidden, we need to show content.
+                                // React way: easier to use state, but this is a simple client component.
+                                // Actually, simpler approach for this component:
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = `https://ui-avatars.com/api/?name=${session.user.name}&background=random`
+                            }}
+                        />
                     ) : (
                         userInitial
                     )}
