@@ -4,7 +4,6 @@ import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
 import EmailProvider from "next-auth/providers/email"
 import { prisma } from "@/lib/prisma"
-
 import CredentialsProvider from "next-auth/providers/credentials"
 
 export const authOptions: NextAuthOptions = {
@@ -49,8 +48,18 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         session: async ({ session, token }) => {
-            if (session?.user) {
-                (session.user as any).id = token.sub;
+            if (token?.sub) {
+                // Fetch fresh user data from DB to get latest name/image
+                // This avoids storing large Base64 images in usage JWT cookie
+                const user = await prisma.user.findUnique({
+                    where: { id: token.sub }
+                });
+
+                if (user) {
+                    (session.user as any).id = user.id;
+                    session.user.name = user.name;
+                    session.user.image = user.image;
+                }
             }
             return session;
         },
@@ -62,6 +71,6 @@ export const authOptions: NextAuthOptions = {
         }
     },
     pages: {
-        signIn: '/auth/signin', // Custom signin page if needed, or default
+        signIn: '/auth/signin',
     },
 }

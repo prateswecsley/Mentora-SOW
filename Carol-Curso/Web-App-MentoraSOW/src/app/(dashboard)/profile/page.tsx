@@ -63,6 +63,9 @@ export default function ProfilePage() {
 
         try {
             const payload: any = { name, image: imageUrl }
+            if (newPassword) {
+                payload.password = newPassword
+            }
 
             // Send to API
             const res = await fetch("/api/user/profile", {
