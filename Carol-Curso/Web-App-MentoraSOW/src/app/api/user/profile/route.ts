@@ -19,6 +19,7 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ error: "Name must be at least 2 characters" }, { status: 400 })
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateData: any = {
             name: name || undefined,
             image: image || undefined

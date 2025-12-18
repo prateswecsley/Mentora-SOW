@@ -33,6 +33,7 @@ export function ArchetypeQuestionBlock({
             const letters = value.split(',').map(l => l.trim()).filter(l => l)
             setSelectedLetters(letters)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value])
 
     const toggleLetter = (letter: string) => {

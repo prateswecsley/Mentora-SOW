@@ -28,8 +28,12 @@ export function FinalReportClient() {
 
             // Refresh the page to show the generated report
             router.refresh()
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError("Ocorreu um erro desconhecido.")
+            }
         } finally {
             setIsGenerating(false)
         }

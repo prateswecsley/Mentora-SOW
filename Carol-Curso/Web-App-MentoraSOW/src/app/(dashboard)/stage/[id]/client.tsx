@@ -10,6 +10,7 @@ import { archetypeQuestionsData } from "@/data/archetypeQuestions"
 
 interface StageClientProps {
     stageId: number
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     questions: any[]
     initialAnswers: Record<string, string>
     initialReport?: string | null

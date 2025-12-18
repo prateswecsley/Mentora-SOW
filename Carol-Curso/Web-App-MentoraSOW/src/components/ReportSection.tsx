@@ -55,9 +55,10 @@ export function ReportSection({ report, onNextStage, onRetry }: ReportSectionPro
             }
 
             pdf.save("Relatorio-Mentoria-SOW.pdf")
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao gerar PDF:", error)
-            alert(`Erro ao gerar o PDF: ${error.message || error}`)
+            const message = error instanceof Error ? error.message : String(error)
+            alert(`Erro ao gerar o PDF: ${message}`)
         } finally {
             setIsDownloading(false)
         }

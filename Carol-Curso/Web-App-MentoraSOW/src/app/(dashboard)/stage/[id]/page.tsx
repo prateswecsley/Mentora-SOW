@@ -14,7 +14,7 @@ export default async function StagePage({ params }: { params: Promise<{ id: stri
     const stageId = parseInt(id)
 
     const user = await prisma.user.findUnique({
-        where: { email: session.user?.email! },
+        where: { email: session.user?.email || "" },
         include: {
             answers: { where: { stageId } },
             reports: { where: { stageId } }
@@ -25,6 +25,7 @@ export default async function StagePage({ params }: { params: Promise<{ id: stri
     const report = user?.reports[0]?.report
 
     // Define questions for each stage
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questions: any[] = []
     let stageTitle = ""
     let stageDescription = ""

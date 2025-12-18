@@ -1,0 +1,49 @@
+﻿
+> mentora-sow@0.1.0 build
+> npx prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Γ£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 116ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+   Γû▓ Next.js 16.0.8 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 7.2s
+   Running TypeScript ...
+   Collecting page data using 13 workers ...
+   Generating static pages using 13 workers (0/15) ...
+   Generating static pages using 13 workers (3/15) 
+   Generating static pages using 13 workers (7/15) 
+   Generating static pages using 13 workers (11/15) 
+ Γ£ô Generating static pages using 13 workers (15/15) in 1254.5ms
+   Finalizing page optimization ...
+
+Route (app)
+Γöî ╞Æ /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /api/auth/[...nextauth]
+Γö£ ╞Æ /api/chat
+Γö£ ╞Æ /api/generate-final-report
+Γö£ ╞Æ /api/generate-report
+Γö£ ╞Æ /api/save-answer
+Γö£ ╞Æ /api/user/profile
+Γö£ Γùï /auth/signin
+Γö£ ╞Æ /chat
+Γö£ ╞Æ /dashboard
+Γö£ ╞Æ /final-report
+Γö£ ╞Æ /profile
+Γö£ ╞Æ /profile/settings
+Γö£ ╞Æ /stage/[id]
+Γöö ╞Æ /stage/[id]/intro
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

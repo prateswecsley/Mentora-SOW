@@ -48,7 +48,7 @@ export function UserMenu() {
                                 // Actually, simpler approach for this component:
                                 const target = e.target as HTMLImageElement;
                                 target.onerror = null;
-                                target.src = `https://ui-avatars.com/api/?name=${session.user.name}&background=random`
+                                target.src = `https://ui-avatars.com/api/?name=${session?.user?.name || "User"}&background=random`
                             }}
                         />
                     ) : (

@@ -11,7 +11,7 @@ export default async function FinalReportPage() {
 
     // Fetch user with all reports
     const user = await prisma.user.findUnique({
-        where: { email: session.user?.email! },
+        where: { email: session.user?.email || "" },
         include: {
             reports: true,
         }

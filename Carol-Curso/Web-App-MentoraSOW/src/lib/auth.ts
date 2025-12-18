@@ -55,7 +55,8 @@ export const authOptions: NextAuthOptions = {
                     where: { id: token.sub }
                 });
 
-                if (user) {
+                if (user && session.user) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (session.user as any).id = user.id;
                     session.user.name = user.name;
                     session.user.image = user.image;

@@ -1,0 +1,49 @@
+﻿
+> mentora-sow@0.1.0 build
+> npx prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Γ£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 102ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+   Γû▓ Next.js 16.0.8 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 6.9s
+   Running TypeScript ...
+node.exe : Failed to compile.
+At C:\Program Files\nodejs\npm.ps1:29 char:3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to c 
+   ompile.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./src/components/UserMenu.tsx:51:82
+Type error: 'session.user' is possibly 'undefined'.
+
+[0m [90m 49 |[39m                                 
+[36mconst[39m target [33m=[39m e[33m.[39mtarget 
+[36mas[39m [33mHTMLImageElement[39m[33m;[39m
+ [90m 50 |[39m                                 
+target[33m.[39monerror [33m=[39m 
+[36mnull[39m[33m;[39m
+[31m[1m>[22m[39m[90m 51 |[39m                      
+           target[33m.[39msrc [33m=[39m [32m`https:/
+/ui-avatars.com/api/?name=${session.user.name}&background
+=random`[39m
+ [90m    |[39m                                         
+                                         
+[31m[1m^[22m[39m
+ [90m 52 |[39m                             }}
+ [90m 53 |[39m                         
+[33m/[39m[33m>[39m
+ [90m 54 |[39m                     ) [33m:[39m ([0m
+Next.js build worker exited with code: 1 and signal: null

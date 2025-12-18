@@ -14,7 +14,7 @@ export default async function DashboardPage() {
     let user = null
     try {
         user = await prisma.user.findUnique({
-            where: { email: session.user?.email! },
+            where: { email: session.user?.email || "" },
             include: {
                 answers: true,
                 reports: true,

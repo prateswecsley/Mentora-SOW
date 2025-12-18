@@ -50,7 +50,7 @@ export function QuestionBlock({ id, title, tip, example, value, onChange, onSave
 
                     <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
                         <p className="text-sm text-gray-400 font-medium mb-1">✨ Exemplo</p>
-                        <p className="text-sm text-gray-500 italic">"{example}"</p>
+                        <p className="text-sm text-gray-500 italic">&quot;{example}&quot;</p>
                     </div>
                 </div>
 
