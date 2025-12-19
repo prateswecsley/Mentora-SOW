@@ -67,7 +67,8 @@ export const authOptions: NextAuthOptions = {
         },
         jwt: async ({ token, user }) => {
             if (user) {
-                token.sub = user.id;
+                // Minimize cookie size: ONLY store the user ID
+                return { sub: user.id }
             }
             return token;
         }
