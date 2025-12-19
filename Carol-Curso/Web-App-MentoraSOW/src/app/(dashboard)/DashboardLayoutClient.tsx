@@ -23,7 +23,7 @@ export function DashboardLayoutClient({ children, completedStages }: DashboardLa
     const currentStage = match ? parseInt(match[1]) : 0
 
     return (
-        <div className="flex h-screen bg-gray-900 relative overflow-hidden">
+        <div className="flex h-[100dvh] bg-gray-900 relative overflow-hidden">
             {/* Background Image with Overlay */}
             <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
